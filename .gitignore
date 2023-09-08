@@ -1,3 +1,11 @@
+# Quaser folders
+Bin/
+Build/
+
+# Visual Studio files
+.vs/
+*.sln
+
 # Prerequisites
 *.d
 
