@@ -1,3 +1,6 @@
+local vulkan_sdk = os.getenv("VULKAN_SDK")
+local glfw_folder = "Dependencies/glfw/"
+
 cppdialect "C++17"
 language "C++"
 staticruntime "off"
@@ -34,7 +37,37 @@ workspace "Quasar"
         }
 
         links {
-            "GLFW"
+            "GLFW",
+            "Vulkan"
+        }
+
+        includedirs {
+            glfw_folder.."include",
+            "%{vulkan_sdk}/Include",
+            "%{vulkan_sdk}/Source",
+        }
+
+group "Dependencies"
+
+    project "Vulkan"
+        kind "StaticLib"
+
+        location ( "Bin/Vulkan" )
+        targetdir( "Build/Vulkan/%{cfg.buildcfg}" )
+
+        files {
+            "%{vulkan_sdk}/Include/**",
+            "%{vulkan_sdk}/Source/SPIRV-Reflect/spirv_reflect.c",
+        }
+
+        links {
+            "%{vulkan_sdk}/Lib/vulkan-1.lib",
+        }
+
+        defines {
+            "VULKAN_HPP_NO_NODISCARD_WARNINGS",
+            "VULKAN_HPP_NO_EXCEPTIONS",
+            "VK_USE_PLATFORM_WIN32_KHR",        
         }
 
     project "GLFW"
@@ -42,8 +75,6 @@ workspace "Quasar"
 
         location ( "Bin/GLFW" )
         targetdir( "Build/GLFW/%{cfg.buildcfg}" )
-
-        local glfw_folder = "Dependencies/glfw/"
 
         files {
             glfw_folder.."include/GLFW/glfw3.h",
@@ -82,3 +113,5 @@ workspace "Quasar"
                 "_GLFW_WIN32",
                 "_CRT_SECURE_NO_WARNINGS"
             }
+
+group ""
