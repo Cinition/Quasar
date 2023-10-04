@@ -1,5 +1,5 @@
-local vulkan_sdk = os.getenv("VULKAN_SDK")
-local glfw_folder = "Dependencies/glfw/"
+vulkan_sdk = os.getenv("VULKAN_SDK")
+glfw_folder = "Dependencies/glfw/"
 
 cppdialect "C++17"
 language "C++"
@@ -16,59 +16,43 @@ filter "configurations:Release"
     symbols "off"
     defines { "RELEASE" }
 
+defines {
+    -- VULKAN
+    "VULKAN_HPP_NO_NODISCARD_WARNINGS",
+    "VULKAN_HPP_NO_EXCEPTIONS",
+    "VK_USE_PLATFORM_WIN32_KHR",        
+}
+
 workspace "Quasar"
     architecture "x86_64"
+    configurations { "Debug","Release" }
     startproject "Quasar"
 
-    configurations {
-        "Debug",
-        "Release"
-    }
-    
     project "Quasar"
-        kind "ConsoleApp"
-            
+        kind "WindowedApp"
         location ( "Bin/Quasar" )
-        targetdir( "Build/Qausar/%{cfg.buildcfg}" )
+        targetdir( "Build/Quasar/%{cfg.buildcfg}" )
         
         files {
             "Src/**.h",
-            "Src/**.cpp"
+            "Src/**.cpp",
+            -- VULKAN
+            "%{vulkan_sdk}/Source/SPIRV-Reflect/*.h",
         }
 
         links {
             "GLFW",
-            "Vulkan"
+            "%{vulkan_sdk}/Lib/vulkan-1.lib",
         }
 
         includedirs {
-            glfw_folder.."include",
+            glfw_folder.."include/",
+            -- VULKAN
             "%{vulkan_sdk}/Include",
             "%{vulkan_sdk}/Source",
         }
 
 group "Dependencies"
-
-    project "Vulkan"
-        kind "StaticLib"
-
-        location ( "Bin/Vulkan" )
-        targetdir( "Build/Vulkan/%{cfg.buildcfg}" )
-
-        files {
-            "%{vulkan_sdk}/Include/**",
-            "%{vulkan_sdk}/Source/SPIRV-Reflect/spirv_reflect.c",
-        }
-
-        links {
-            "%{vulkan_sdk}/Lib/vulkan-1.lib",
-        }
-
-        defines {
-            "VULKAN_HPP_NO_NODISCARD_WARNINGS",
-            "VULKAN_HPP_NO_EXCEPTIONS",
-            "VK_USE_PLATFORM_WIN32_KHR",        
-        }
 
     project "GLFW"
         kind "StaticLib"
